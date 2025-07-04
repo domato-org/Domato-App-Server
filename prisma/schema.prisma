@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+        
+model User {
+  id                  String      @id @default(uuid())
+  name                String
+  mobileNumber        String      @unique
+  alternativeMobile   String?
+  email               String?     
+  city                String?
+  state               String?
+  pincode             String?
+  fullAddress         String?
+  profileImage        String?     // ✅ URL or path of the user's image
+
+  // Relationships
+  cartItems           CartItem[]
+  orders              Order[]
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+
+model CartItem {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  itemId    String   // Link to your `Item` model (assumed to exist)
+  quantity  Int      @default(1)
+
+  createdAt DateTime @default(now())
+}
+
+
+enum OrderStatus {
+  SHIPPING_IN_PROGRESS
+  DELIVERED
+  CANCELED
+}
+
+model Order {
+  id          String       @id @default(uuid())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String
+
+  items       OrderItem[]  // Relation to ordered items
+  totalAmount Float
+  status      OrderStatus
+  shippingAddress String   // Could copy from user or allow custom
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+
+  itemId    String   // Link to your `Item` model
+  quantity  Int
+  price     Float    // Store price at time of purchase
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String
+  items Item[] // assuming each category has many items
+}
+
+model Item {
+  id               String   @id @default(uuid())
+  name             String
+  description      String
+  slug             String   @unique
+  color            String
+  size             String
+  categoryId       String
+  category         Category @relation(fields: [categoryId], references: [id])
+  material         String
+  price            Float
+  originalPrice    Float
+  itemCode         String   @unique
+  manufacturer     String
+  countryOfOrigin  String
+  weight           Float
+  numberOfPieces   Int
+  recommendedAge   String?
+  instructions     String?
+  itemsInBox       Int
+  images           String[] // Or a separate Image model
+  stock            Int
+  isAvailable      Boolean  @default(true)
+  brand            String?
+  rating           Float    @default(0)
+  totalReviews     Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
