@@ -1,8 +1,7 @@
-// ✅ app/api/login/verify-otp/route.ts
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import twilio from "twilio";
-import {prisma} from "@/lib/prisma"; // make sure you import this correctly
+import { prisma } from "@/lib/prisma";
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID!,
@@ -22,12 +21,11 @@ export async function POST(req: Request) {
       .verificationChecks.create({ to: phone, code: otp });
 
     if (result.status === "approved") {
-      // 🔍 Check if user already exists
+      // ✅ Check user
       let user = await prisma.user.findUnique({
         where: { mobileNumber: phone },
       });
 
-      // 👤 If not, create user with minimal data
       if (!user) {
         user = await prisma.user.create({
           data: {
@@ -35,15 +33,18 @@ export async function POST(req: Request) {
             mobileNumber: phone,
           },
         });
+      } else {
+        // ✅ Update name
+        user = await prisma.user.update({
+          where: { mobileNumber: phone },
+          data: { name },
+        });
       }
 
-      // ✅ Create JWT Token
       const token = jwt.sign(
         { id: user.id, phone: user.mobileNumber },
         process.env.JWT_SECRET!,
-        {
-          expiresIn: "365d",
-        }
+        { expiresIn: "365d" }
       );
 
       return NextResponse.json({ success: true, user, token });
