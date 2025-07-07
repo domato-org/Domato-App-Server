@@ -77,7 +77,7 @@ model OrderItem {
   price     Float    // Store price at time of purchase
 }
 
-model Category {
+model Level {
   id    String @id @default(uuid())
   name  String
   items Item[] // assuming each category has many items
@@ -85,30 +85,33 @@ model Category {
 
 model Item {
   id               String   @id @default(uuid())
+  itemCode         String   @unique
   name             String
+  images           String[] // Or a separate Image model
   description      String
-  slug             String   @unique
-  color            String
-  size             String
-  categoryId       String
-  category         Category @relation(fields: [categoryId], references: [id])
-  material         String
+  instructions     String?
+  category         String
   price            Float
   originalPrice    Float
-  itemCode         String   @unique
+  levelId          String
+  level            Level @relation(fields: [levelId], references: [id])
+  numberOfPieces   String
+  color            String
+  material         String
+  recommendedAge   String?
+  size             String
+  weight           String
+  itemsInBox       String
+  totalItemsSold   String
+  brand            String?
   manufacturer     String
   countryOfOrigin  String
-  weight           Float
-  numberOfPieces   Int
-  recommendedAge   String?
-  instructions     String?
-  itemsInBox       Int
-  images           String[] // Or a separate Image model
-  stock            Int
-  isAvailable      Boolean  @default(true)
-  brand            String?
   rating           Float    @default(0)
-  totalReviews     Int      @default(0)
+  totalReviews     String   
+  isAvailable      Boolean  @default(true)
+  isPitara         Boolean  @default(false) 
+  isPopular        Boolean  @default(false) 
+  IsLovedByKids    Boolean  @default(false) 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }

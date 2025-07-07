@@ -11,8 +11,10 @@
   "dependencies": {
     "@prisma/client": "^6.11.1",
     "@prisma/extension-accelerate": "^2.0.1",
+    "formidable": "^3.5.4",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.4",
+    "next-connect": "^1.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "twilio": "^5.7.1"
