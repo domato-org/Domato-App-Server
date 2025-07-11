@@ -89,7 +89,7 @@ model Item {
   name             String
   images           String[] // Or a separate Image model
   description      String
-  instructions     String?
+  instructions     String
   category         String
   price            Float
   originalPrice    Float
@@ -98,15 +98,15 @@ model Item {
   numberOfPieces   String
   color            String
   material         String
-  recommendedAge   String?
+  recommendedAge   String
   size             String
   weight           String
   itemsInBox       String
   totalItemsSold   String
-  brand            String?
+  brand            String
   manufacturer     String
   countryOfOrigin  String
-  rating           Float    @default(0)
+  rating           String
   totalReviews     String   
   isAvailable      Boolean  @default(true)
   isPitara         Boolean  @default(false) 
