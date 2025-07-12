@@ -13,38 +13,21 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-        
-model User {
-  id                  String      @id @default(uuid())
-  name                String
-  mobileNumber        String      @unique
-  alternativeMobile   String?
-  email               String?     
-  city                String?
-  state               String?
-  pincode             String?
-  fullAddress         String?
-  profileImage        String?     // ✅ URL or path of the user's image
-
-  // Relationships
-  cartItems           CartItem[]
-  orders              Order[]
-
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
-}
-
 
 model CartItem {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  itemId    String   // Link to your `Item` model (assumed to exist)
-  quantity  Int      @default(1)
+  id String @id @default(uuid())
 
+  // User relationship
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Item relationship
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id])
+
+  quantity  Int      @default(1)
   createdAt DateTime @default(now())
 }
-
 
 enum OrderStatus {
   SHIPPING_IN_PROGRESS
@@ -53,28 +36,45 @@ enum OrderStatus {
 }
 
 model Order {
-  id          String       @id @default(uuid())
-  user        User         @relation(fields: [userId], references: [id])
-  userId      String
-
-  items       OrderItem[]  // Relation to ordered items
-  totalAmount Float
-  status      OrderStatus
-  shippingAddress String   // Could copy from user or allow custom
-
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id              String      @id @default(uuid())
+  user            User        @relation(fields: [userId], references: [id])
+  userId          String
+  items           OrderItem[] // Relation to ordered items
+  totalAmount     Float
+  status          OrderStatus
+  shippingAddress String // Could copy from user or allow custom
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
+model User {
+  id                String  @id @default(uuid())
+  name              String
+  mobileNumber      String  @unique
+  alternativeMobile String?
+  email             String?
+  city              String?
+  state             String?
+  pincode           String?
+  fullAddress       String?
+  profileImage      String? // ✅ URL or path of the user's image
+
+  // Relationships
+  cartItems CartItem[]
+  orders    Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 model OrderItem {
-  id        String   @id @default(uuid())
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId   String
+  id      String @id @default(uuid())
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String
 
-  itemId    String   // Link to your `Item` model
-  quantity  Int
-  price     Float    // Store price at time of purchase
+  itemId   String // Link to your `Item` model
+  quantity Int
+  price    Float // Store price at time of purchase
 }
 
 model Level {
@@ -84,34 +84,38 @@ model Level {
 }
 
 model Item {
-  id               String   @id @default(uuid())
-  itemCode         String   @unique
-  name             String
-  images           String[] // Or a separate Image model
-  description      String
-  instructions     String
-  category         String
-  price            Float
-  originalPrice    Float
-  levelId          String
-  level            Level @relation(fields: [levelId], references: [id])
-  numberOfPieces   String
-  color            String
-  material         String
-  recommendedAge   String
-  size             String
-  weight           String
-  itemsInBox       String
-  totalItemsSold   String
-  brand            String
-  manufacturer     String
-  countryOfOrigin  String
-  rating           String
-  totalReviews     String   
-  isAvailable      Boolean  @default(true)
-  isPitara         Boolean  @default(false) 
-  isPopular        Boolean  @default(false) 
-  IsLovedByKids    Boolean  @default(false) 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String   @id @default(uuid())
+  itemCode        String   @unique
+  name            String
+  images          String[]
+  description     String
+  instructions    String
+  category        String
+  price           Float
+  originalPrice   Float
+  levelId         String
+  level           Level    @relation(fields: [levelId], references: [id])
+  numberOfPieces  String
+  color           String
+  material        String
+  recommendedAge  String
+  size            String
+  weight          String
+  itemsInBox      String
+  totalItemsSold  String
+  brand           String
+  manufacturer    String
+  countryOfOrigin String
+  rating          String
+  totalReviews    String
+
+  // ✅ This is correct: one item can appear in many cartItems
+  cartItems CartItem[]
+
+  isAvailable   Boolean  @default(true)
+  isPitara      Boolean  @default(false)
+  isPopular     Boolean  @default(false)
+  IsLovedByKids Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
